@@ -8,6 +8,8 @@ from pylab import mpl
 mpl.rcParams["font.sans-serif"] = ["SimHei"]
 mpl.rcParams["figure.autolayout"] = True
 
+# import gc
+
 import light_effects_clear
 import night_enhancement
 import object_detection
@@ -23,7 +25,7 @@ light_imgsz = 1024
 
 enhance_model = 'SID'
 
-detect_model_name = 'car_day_40k.pt'
+detect_model_name = 'bdd_day40k.pt'
 detect_imgsz = 640
 detect_conf = 0.5
 
@@ -163,46 +165,11 @@ def start(input_included=True):
         result_files = os.listdir(object_detection_result_path)
         for file in result_files:
             mycopyfile(os.path.join(object_detection_result_path, file), os.path.join(new_dir))
-    # else:
-    #     for file in night_enhancement_result_files:
-    #         mycopyfile(os.path.join(night_enhancement_result_path, file), os.path.join(object_detection_result_path))
 
-    # for file in input_files:
-    #     i = 1
-    #     # titles = ['原图像']
-    #     # plt.figure(figsize=(10,10))
-    #     plt.figure(figsize=(12.8, 9.6))  # (6.4, 4.8 by default)
-    #     plt.tight_layout()
-    #     plt.subplot(2,2,1)
-    #     plt.imshow(mpimg.imread(os.path.join(input_path, file)))
-    #     plt.title('原图像')
-    #     plt.xticks([]), plt.yticks([])
-    #     if is_light_effects_clear_chosen:
-    #         i += 1
-    #         # titles.append('强光分离后')
-    #         plt.subplot(2,2,i)
-    #         plt.imshow(mpimg.imread(os.path.join(light_effect_result_path, file[:-3] + 'png')))
-    #         plt.title('强光分离后')
-    #         plt.xticks([]), plt.yticks([])
-    #     if is_night_enhancement_chosen:
-    #         i += 1
-    #         # titles.append('暗光增强后')
-    #         plt.subplot(2,2,i)
-    #         plt.imshow(mpimg.imread(os.path.join(night_enhancement_result_path, file[:-3] + 'png')))
-    #         plt.title('弱光分离后')
-    #         plt.xticks([]), plt.yticks([])
-    #     if is_object_detection_chosen:
-    #         i += 1
-    #         # titles.append('目标检测结果')
-    #         plt.subplot(2,2,i)
-    #         plt.imshow(mpimg.imread(os.path.join(object_detection_result_path, file[:-3] + 'png')))
-    #         plt.title('目标检测结果')
-    #         plt.xticks([]), plt.yticks([])
-    #     # plt.title(titles)
-    #     # plt.imsave(os.path.join(output_time, file))
-    #     plt.savefig(os.path.join(output_time, file[:-3] + 'png'))
-
-    object_detection_result_files = os.listdir(object_detection_result_path)
+    if is_object_detection_chosen:
+        if not os.path.exists(object_detection_result_path):
+            os.mkdir(object_detection_result_path)
+        object_detection_result_files = os.listdir(object_detection_result_path)
 
     rows = 0
     if is_light_effects_clear_chosen:
@@ -236,7 +203,7 @@ def start(input_included=True):
             pos += 1
             plt.subplot(sub_rows,2,pos)
             plt.imshow(mpimg.imread(os.path.join(night_enhancement_result_path, night_enhancement_result_files[i])))
-            plt.title('弱光分离后')
+            plt.title('暗光增强后')
             plt.xticks([]), plt.yticks([])
         if is_object_detection_chosen:
             pos += 1
@@ -247,6 +214,10 @@ def start(input_included=True):
         # plt.title(titles)
         # plt.imsave(os.path.join(output_time, file))
         plt.savefig(os.path.join(output_time, input_files[i]))
+        plt.close()
+
+        # del plt
+        # gc.collect()
 
     with open(os.path.join(output_time, nowTime + '.log.txt'), 'w', encoding='utf-8') as f:
         f.write('[images]\n')

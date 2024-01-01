@@ -1,9 +1,3 @@
-"""
-本代码由[Tkinter布局助手]生成
-官网:https://www.pytk.net
-QQ交流群:788392508
-在线反馈:https://support.qq.com/product/618914
-"""
 import os
 import os.path
 import shutil
@@ -13,7 +7,7 @@ from tkinter.ttk import *
 from tkinter import filedialog
 
 # from main_ui import WinGUI
-#
+
 import main_logic
 from main_logic import start
 
@@ -23,9 +17,6 @@ class Controller:
     # ui: WinGUI
 
     def __init__(self):
-        # self.last_time = ""
-        # self.in_progress = False
-        # self.end_time = ""
         pass
 
     def init(self, ui):
@@ -85,56 +76,93 @@ class Controller:
         # self.ui.start_state.set("开始测试")
 
     def check_selected_files(self, evt):
-        for index in self.ui.tk_list_box_box_listdir.curselection():
-            # file_name = self.ui.tk_list_box_box_listdir.itemcget(index, 'background')
-            file_name = self.ui.tk_list_box_box_listdir.get(index)
-            file_path = os.path.join('./input/', file_name)
-            abs_path = os.path.abspath(file_path)
-            print(f'try to open {file_path}')
-            os.system(f'start explorer {abs_path}')
+        for node in self.ui.tree.selection():
+            abspath = self.ui.nodes.get(node)
+            if not abspath or os.path.isdir(abspath):
+                continue
+            print(f'try to open {abspath}')
+            os.system(f'start explorer {abspath}')
 
     def delete_selected_files(self, evt):
-        for index in self.ui.tk_list_box_box_listdir.curselection():
-            # file_name = self.ui.tk_list_box_box_listdir.itemcget(index)
-            file_name = self.ui.tk_list_box_box_listdir.get(index)
-            file_path = os.path.join('./input/', file_name)
-            # shutil.rmtree(file_path)
-            os.remove(file_path)
-        self.ui.tk_listdir_update()
+        for node in self.ui.tree.selection():
+            abspath = self.ui.nodes.get(node)
+            if not abspath or os.path.isdir(abspath):
+                continue
+            os.remove(abspath)
+        self.ui.tk_dir_tree(self.ui, self.ui.base_dir)
 
     def refresh_files(self, evt):
-        self.ui.tk_listdir_update()
+        self.ui.tk_dir_tree(self.ui, self.ui.base_dir)
+        # self.ui.tk_listdir_update()
 
     '''other buttons'''
 
-    def open_input_dir(self, evt):
-        abs_path = os.path.abspath('./input/')
-        os.system(f'start explorer {abs_path}')
-        # print("<Button-1>事件未处理:", evt)
+    def open_cur_dir(self, evt):
+        base = './' + self.ui.base_dir + '/'
+        abspath = os.path.abspath(base)
+        os.system(f'start explorer {abspath}')
+
+    def switch_dir(self, evt):
+        if self.ui.base_dir == 'input':
+            self.ui.base_dir = 'output'
+            self.ui.tk_dir_tree(self.ui, 'output')
+        else:
+            self.ui.base_dir = 'input'
+            self.ui.tk_dir_tree(self.ui, 'input')
+        # self.ui.base_dir = 'input'
+        # self.ui.tk_dir_tree(self.ui, 'input')
+        # abs_path = os.path.abspath('./input/')
+        # os.system(f'start explorer {abs_path}')
 
     def add_files(self, evt):
         file_paths = filedialog.askopenfilenames()
         for file_path in file_paths:
             main_logic.mycopyfile(file_path, './input/')
-        # print("<Button-1>事件未处理:", evt)
 
     def clear_files(self, evt):
         shutil.rmtree('./input/')
         os.mkdir('./input/')
-        # print("<Button-1>事件未处理:", evt)
 
     def check_last_test(self, evt):
-        # output_dirs = [path for path in os.listdir('./output/') if os.path.isdir(path)]
-        # print(os.listdir('./output/'))
-        # print(output_dirs)
-        # abs_path = os.path.abspath(os.path.join('./output/', output_dirs[-1]))
         dirs = os.listdir('./output/')
         dir_name = dirs[-1]
         abs_path = os.path.abspath(os.path.join('./output/', dir_name))
         os.system(f'start explorer {abs_path}')
-        # print("<Button-1>事件未处理:", evt)
+
+    def check_last_argu(self, evt):
+        dirs = os.listdir('./output/')
+        dir_name = dirs[-1]
+        argu_name = dir_name + '.log.txt'
+        abs_path = os.path.abspath(os.path.join('./output/', dir_name, argu_name))
+        print(f'try to open {abs_path}')
+        os.system(f'start explorer {abs_path}')
+
+    def open_cur_img(self, evt):
+        if self.ui.cur_img_path == '':
+            return
+        os.system(f'start explorer {self.ui.cur_img_path}')
 
     def open_output_dir(self, evt):
-        abs_path = os.path.abspath('./output/')
-        os.system(f'start explorer {abs_path}')
-        # print("<Button-1>事件未处理:", evt)
+        self.ui.base_dir = 'output'
+        self.ui.tk_dir_tree(self.ui, 'output')
+        # abs_path = os.path.abspath('./output/')
+        # os.system(f'start explorer {abs_path}')
+
+    # def open_or_show(self, evt):
+    #     lb = self.ui.tk_list_box_box_listdir
+    #     file_name = lb.get(lb.curselection())
+    #     file_path = os.path.join('./input/', file_name)
+    #     abs_path = os.path.abspath(file_path)
+    #     if os.path.isfile(abs_path):
+    #         try:
+    #             img_open = Image.open(abs_path)
+    #             img_png = ImageTk.PhotoImage(img_open)
+                # self.ui.tk_canvas.create_image(img_png)
+                # label_img = Label(self.ui.tk_canvas, image=img_png)
+                # label_img.pack(fill='both', expand=True)
+                # self.ui.label_img = Label(self.ui, image=img_png)
+                # self.ui.label_img.place(x=280, y=80, width=720, height=400)
+        #     except:
+        #         print('img!!!')
+        # print(f'try to open {file_path}')
+        # os.system(f'start explorer {abs_path}')

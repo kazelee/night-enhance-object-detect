@@ -1,0 +1,12 @@
+# Ultralytics YOLO 🚀, GPL-3.0 license
+
+path: ./input/   # dataset root dir
+train: images/train  # train images (relative to 'path') 128 images
+val: images/test  # test images (relative to 'path') 128 images
+test: images/test # test images (optional)
+
+# Classes
+names:
+  0: car
+  1: bus
+  2: truck

@@ -4,16 +4,27 @@ HFUT 领域方向设计 & 毕设选题：
 - 基于暗光增强的夜间车辆识别系统设计与实现
 - 基于光照分量分离的暗光增强系统设计与实现
 
-## 参考项目
+## 实现功能
 
-整合了以下项目（其中第一个项目只使用到了强光分离的部分）：
-- [jinyeying/night-enhancement: [ECCV2022] "Unsupervised Night Image Enhancement: When Layer Decomposition Meets Light-Effects Suppression", https://arxiv.org/abs/2207.10564](https://github.com/jinyeying/night-enhancement)
-- [caiyuanhao1998/Retinexformer: "Retinexformer: One-stage Retinex-based Transformer for Low-light Image Enhancement" (ICCV 2023)](https://github.com/caiyuanhao1998/Retinexformer)
-- [ultralytics/ultralytics: NEW - YOLOv8 🚀 in PyTorch > ONNX > OpenVINO > CoreML > TFLite](https://github.com/ultralytics/ultralytics)
+- 对车灯、有色光晕的强光分离（主要针对车灯的散光，对于路灯和较强的光效果不明显）
+- 选择不同模型对夜间及较暗环境图片进行暗光增强
+- 选择不同模型对图像进行目标检测
 
-注：本项目只保留了测试部分，训练部分请参考上述项目链接自行训练
+部分效果展示：
 
-## 环境部署
+
+
+## 项目环境
+
+操作系统：Windows 11
+
+编程工具：PyCharm Community / VSCode
+
+训练平台：Google Colab
+
+（项目没有在其他环境中测试，不保证其他平台能够运行）
+
+## 初始化操作
 
 通过 `requirements.txt` 文件安装必要包（没有测试效果，可能会有遗漏）
 
@@ -73,3 +84,27 @@ HFUT 领域方向设计 & 毕设选题：
 运行 `main_ui.py` 文件，通过用户界面操作。
 
 注：可以直接将文件直接拖入文件列表框中，然后选择测试参数后，点击运行按钮测试
+
+## 补充说明
+
+目标检测模型（object_weights）的命名规则，如 `bdd_day40k20c.pt`：
+- bdd 表示训练数据集来自 BDD 提供的数据集（同理 sc 表示 Stanford Cards）
+  - 如果是 bddcar，则表示训练标签只有 car（没有 bus 和 truck）
+  - 如果是 bddmix，则表示 car 和 bus / trunk 的标签混合了
+- day 表示训练集的数据是白天还是夜晚（night）
+  - 如果是夜晚，默认的暗光增强模型是 LOL_v1
+- 40k 表示训练集的数量（不标即为默认值 10k）
+- 20 表示训练的 epoch 数（不标即为默认值 10）
+- c 表示模型是基于已训练好的模型进一步训练出来的（比如 20 个 epoch 的模型是在 10 epoch 模型的基础上继续训练而来，如果没有 c 则表示模型是一次性训练出来的）
+- 如果后缀为 512，则表示是使用 512x512 的图片训练的，理论上只对 16:9 resize 到 1:1 的测试集有较好的效果，属于训练前期的失败模型
+
+注：yolobv8n.pt 模型是 yolo 项目提供的最基础的 pretrained model
+
+## 参考项目
+
+整合了以下项目（其中第一个项目只使用到了强光分离的部分）：
+- [jinyeying/night-enhancement: [ECCV2022] "Unsupervised Night Image Enhancement: When Layer Decomposition Meets Light-Effects Suppression", https://arxiv.org/abs/2207.10564](https://github.com/jinyeying/night-enhancement)
+- [caiyuanhao1998/Retinexformer: "Retinexformer: One-stage Retinex-based Transformer for Low-light Image Enhancement" (ICCV 2023)](https://github.com/caiyuanhao1998/Retinexformer)
+- [ultralytics/ultralytics: NEW - YOLOv8 🚀 in PyTorch > ONNX > OpenVINO > CoreML > TFLite](https://github.com/ultralytics/ultralytics)
+
+注：本项目只保留了测试部分，训练部分请参考上述项目链接自行训练
