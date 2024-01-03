@@ -5,7 +5,7 @@ import time
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import filedialog
-
+from tkinter import messagebox
 # from main_ui import WinGUI
 
 import main_logic
@@ -13,8 +13,13 @@ from main_logic import start
 
 class Controller:
     # 导入UI类后，替换以下的 object 类型，将获得 IDE 属性提示功能
-    ui: object
+    # ui: object
     # ui: WinGUI
+    try:
+        from main_ui import WinGUI
+        ui: WinGUI
+    except:
+        ui: object
 
     def __init__(self):
         pass
@@ -26,36 +31,41 @@ class Controller:
         self.ui = ui
         # TODO 组件初始化 赋值操作
 
+    # def tmp_start_test(self, evt):
+    #     flag = messagebox.askokcancel('提示', '确定测试运行吗？')
+    #     if flag:
+    #         self.start_test(evt)
+
     def start_test(self, evt):
-        # if self.ui.start_state.get() != "开始测试":
-        #     # exit(1)
-        #     raise SystemExit(1)
+        # flag = messagebox.askokcancel('提示', '确定测试运行吗？')
+        # if not flag:
+        #     return
+        if not messagebox.askokcancel('提示', '要执行此操作吗？'):
+        #     self.ui.tk_button_start_test.config(state=NORMAL)
+            return
 
         if not self.ui.is_light_check.get() and not self.ui.is_night_check.get() and not self.ui.is_object_check.get():
             self.ui.hint_content.set("请至少选择参数设置中的一项！")
-            # print("<Button-1>事件未处理:", evt)
+            # self.ui.tk_button_start_test.config(state=NORMAL)
             return
 
         if main_logic.is_input_dir_empty():
             self.ui.hint_content.set("input 文件夹中没有文件！")
+            # self.ui.tk_button_start_test.config(state=NORMAL)
             return
 
-        # self.ui.start_state.set("强制停止")
-        # self.ui.tk_button_start_test.update()
-
-        # self.ui.tk_label_text_hint.setvar("正在测试中……")
         self.ui.hint_content.set("正在测试中……")
         self.ui.tk_label_text_hint.update()
-        # self.ui.tk_label_text_hint.setvar(self.ui.hint_content.get())
-        # self.ui.tk_label_text_hint.waitvar()
-        # self.ui.tk_label_text_hint.wait_variable(self.ui.hint_content)
-        # time.sleep(0.1)
-        # if int(self.ui.object_imgsz) % 32 != 0:
-        #     self.ui.object_imgsz = int(self.ui.object_imgsz) // 32 * 32 + 32
 
         main_logic.is_light_effects_clear_chosen = self.ui.is_light_check.get()
         main_logic.is_night_enhancement_chosen = self.ui.is_night_check.get()
         main_logic.is_object_detection_chosen = self.ui.is_object_check.get()
+
+        main_logic.has_night_enhancement_compare = self.ui.has_compare.get()
+        '''main_logic中默认为False，仅当compare为True时考虑子选项'''
+        if self.ui.has_compare.get():
+            main_logic.has_object_detection_compare = self.ui.has_com_obj.get()
+            main_logic.has_detect_origin_img = self.ui.has_com_ori.get()
 
         main_logic.light_imgsz = int(self.ui.light_imgsz.get())
         # main_logic.detect_imgsz = int(self.ui.object_imgsz.get())
@@ -84,6 +94,10 @@ class Controller:
             os.system(f'start explorer {abspath}')
 
     def delete_selected_files(self, evt):
+        if not messagebox.askokcancel('提示', '确定要删除选择的文件吗？'):
+        #     self.ui.tk_button_delete.config(state=NORMAL)
+            return
+
         for node in self.ui.tree.selection():
             abspath = self.ui.nodes.get(node)
             if not abspath or os.path.isdir(abspath):
@@ -93,7 +107,6 @@ class Controller:
 
     def refresh_files(self, evt):
         self.ui.tk_dir_tree(self.ui, self.ui.base_dir)
-        # self.ui.tk_listdir_update()
 
     '''other buttons'''
 
@@ -109,10 +122,6 @@ class Controller:
         else:
             self.ui.base_dir = 'input'
             self.ui.tk_dir_tree(self.ui, 'input')
-        # self.ui.base_dir = 'input'
-        # self.ui.tk_dir_tree(self.ui, 'input')
-        # abs_path = os.path.abspath('./input/')
-        # os.system(f'start explorer {abs_path}')
 
     def add_files(self, evt):
         file_paths = filedialog.askopenfilenames()
@@ -120,8 +129,21 @@ class Controller:
             main_logic.mycopyfile(file_path, './input/')
 
     def clear_files(self, evt):
-        shutil.rmtree('./input/')
-        os.mkdir('./input/')
+        # tmp_flag = False
+        if not messagebox.askokcancel('提示', f'确定清空{self.ui.base_dir}文件夹下的所有文件吗？'):
+            # self.ui.tk_button_clear_file.configure(takefocus=False)
+            # self.ui.tk_button_clear_file.state(['!selected'])
+            # self.ui.tk_button_clear_file.configure(relief=RAISED)
+            # self.ui.tk_button_clear_file.setvar('state', '!selected')
+            # self.ui.tk_button_clear_file.update()
+            # self.ui.tk_button_clear_file.configure(state='disabled')
+            # self.ui.tk_button_clear_file.configure(state='normal')
+            # tmp_flag = True
+            return
+        # if tmp_flag:
+        base = './' + self.ui.base_dir + '/'
+        shutil.rmtree(base)
+        os.mkdir(base)
 
     def check_last_test(self, evt):
         dirs = os.listdir('./output/')
@@ -145,24 +167,3 @@ class Controller:
     def open_output_dir(self, evt):
         self.ui.base_dir = 'output'
         self.ui.tk_dir_tree(self.ui, 'output')
-        # abs_path = os.path.abspath('./output/')
-        # os.system(f'start explorer {abs_path}')
-
-    # def open_or_show(self, evt):
-    #     lb = self.ui.tk_list_box_box_listdir
-    #     file_name = lb.get(lb.curselection())
-    #     file_path = os.path.join('./input/', file_name)
-    #     abs_path = os.path.abspath(file_path)
-    #     if os.path.isfile(abs_path):
-    #         try:
-    #             img_open = Image.open(abs_path)
-    #             img_png = ImageTk.PhotoImage(img_open)
-                # self.ui.tk_canvas.create_image(img_png)
-                # label_img = Label(self.ui.tk_canvas, image=img_png)
-                # label_img.pack(fill='both', expand=True)
-                # self.ui.label_img = Label(self.ui, image=img_png)
-                # self.ui.label_img.place(x=280, y=80, width=720, height=400)
-        #     except:
-        #         print('img!!!')
-        # print(f'try to open {file_path}')
-        # os.system(f'start explorer {abs_path}')

@@ -1,3 +1,4 @@
+import tkinter.messagebox
 from tkinter import *
 from tkinter.ttk import *
 import os
@@ -11,7 +12,6 @@ from tkinter.messagebox import showinfo
 import windnd
 
 import tkinter.font as tkFont
-# import ctypes
 from PIL import Image, ImageTk
 
 class WinGUI(Tk):
@@ -25,6 +25,10 @@ class WinGUI(Tk):
         self.is_night_check = BooleanVar(value=True)
         self.is_object_check = BooleanVar(value=True)
 
+        self.has_compare = BooleanVar(value=False)
+        self.has_com_obj = BooleanVar(value=False)
+        self.has_com_ori = BooleanVar(value=False)
+
         self.base_dir = 'input'
         self.cur_img_path = ''
 
@@ -37,8 +41,6 @@ class WinGUI(Tk):
 
         self.myFont = tkFont.Font(family='SimHei', size=20)
         self.labelFont = tkFont.Font(family='SimHei', size=12)
-        # self.s_label = Style()
-        # self.s_label.configure('my.TLabel', font=('SimHei', 15))
         self.s_checkbutton = Style()
         self.s_checkbutton.configure('my.TCheckbutton', font=('SimHei', 12))
         self.s_button = Style()
@@ -46,25 +48,11 @@ class WinGUI(Tk):
         self.s_treeview = Style()
         self.s_treeview.configure('my.Treeview', font=('微软雅黑', 10))
 
-        # self.TB = Style()
-        # self.TB.configure('my.TButton', font=('SimHei', 15))
-        # self.STB = Style()
-        # self.STB.configure('my.LButton', font=('SimHei', 10))
-
-        # self.tk_notebook_widget = self.__tk_notebook_widget(self)
-        # self.style = Style()
-        # self.style.theme_create("MyStyle", parent="alt", settings={
-        #     "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
-        #     "TNotebook.Tab": {"configure": {"padding": [100, 100]}, }})
-        # self.style.theme_use("MyStyle")
-        # self.nodes = dict()
-        # self.tk_dir_tree = self.__tk_dir_tree(self)
         self.tk_dir_tree(self)
 
         self.tk_select_box_choice_night_model = self.__tk_select_box_choice_night_model(self)
         self.tk_select_box_choice_model2 = self.__tk_select_box_choice_model2(self)
         self.tk_check_button_select_light = self.__tk_check_button_select_light(self)
-        # self.tk_list_box_box_listdir = self.__tk_list_box_box_listdir(self)
         self.tk_label_canvas = self.__tk_label_canvas(self)
         self.tk_label_lb_listdir = self.__tk_label_lb_listdir(self)
         self.tk_label_lb_settings = self.__tk_label_lb_settings(self)
@@ -92,9 +80,11 @@ class WinGUI(Tk):
         self.tk_button_delete = self.__tk_button_delete(self)
         self.tk_button_refresh = self.__tk_button_refresh(self)
 
-        # self.label_img = Label()
         self.tk_canvas = self.__tk_canvas(self)
-        # self.tk_label_img = self.__tk_label_img(self)
+        self.tk_label_addition = self.__tk_label_addition(self)
+        self.tk_check_button_compare = self.__tk_check_button_compare(self)
+        self.tk_check_button_com_object = self.__tk_check_button_com_object(self)
+        self.tk_check_button_com_origin = self.__tk_check_button_com_origin(self)
 
     def __win(self):
         self.title("暗光增强车辆检测")
@@ -147,46 +137,20 @@ class WinGUI(Tk):
             self.h_scrollbar(hbar, widget, x, y, w, h, pw, ph)
         self.scrollbar_autohide(vbar, hbar, widget)
 
-    # def __tk_notebook_widget(self, parent):
-    #     nb = Notebook(parent)
-    #     # nb.place(x=0, y=0, width=1280, height=720)
-    #     nb.pack(expand=True, fill='both')
-    #     nb.Frame1 = Frame(nb)
-    #     nb.Frame1.configure(height='200', width='200')
-    #     nb.Frame1.pack(side='left')
-    #     nb.add(nb.Frame1, text='Tab1')
-    #     return nb
-
     '''ui_tree BEG'''
     def tk_dir_tree(self, parent, root='input'):
         base_dir = f'./{root}/'
         self.nodes = dict()
-        # frame = Frame(parent, width=240, height=400)
-        # frame.pack()
-        # frame.place(x=20, y=80)
-        # frame.place(x=20, y=80, width=240, height=400)
         self.tree = Treeview(parent, style='my.Treeview')
         self.tree.place(x=20, y=80, width=240, height=400)
         self.create_bar(parent, self.tree, True, False, 20, 80, 240, 400, 1280, 720)
-        # self.tree.place(x=20, y=80, width=240, height=400)  # new added
-        # self.tree.place(x=20, y=80)
-        # ysb = Scrollbar(frame, orient='vertical', command=self.tree.yview)
-        # xsb = Scrollbar(frame, orient='horizontal', command=self.tree.xview)
-        # self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
-
-        #
-        # self.tree.grid()
-        # ysb.grid(row=0, column=1, sticky='ns')
-        # xsb.grid(row=1, column=0, sticky='ew')
-        # frame.grid()
 
         abspath = os.path.abspath(base_dir)
         self.tree.heading('#0', text=abspath, anchor='w')
-        # self.insert_node('', abspath, abspath)
         self.insert_node('', root, abspath)
         self.tree.bind('<<TreeviewOpen>>', self.open_node)
         self.tree.bind('<Double-Button-1>', self.open_file)
-        # self.tree.place(x=20, y=80)
+
 
     def insert_node(self, parent, text, abspath):
         node = self.tree.insert(parent, 'end', text=text, open=False)
@@ -206,8 +170,6 @@ class WinGUI(Tk):
                 self.tree.delete(self.tree.get_children(node))
                 for p in os.listdir(abspath):
                     self.insert_node(node, p, os.path.join(abspath, p))
-        # else:
-        #     print('bad')  # print when close
 
     def open_file(self, event):
         node = self.tree.focus()
@@ -215,7 +177,6 @@ class WinGUI(Tk):
         if abspath and os.path.isdir(abspath):
             return
 
-        # abspath = self.nodes.pop(node, None)
         if abspath and os.path.isfile(abspath):  # 对图片专门处理
             global img_png
             try:
@@ -227,12 +188,7 @@ class WinGUI(Tk):
                 self.label_img.place(x=280, y=80, width=720, height=400)
             except PIL.UnidentifiedImageError:
                 print('文件必须是图片')
-
-        # self.tree.delete(self.tree.get_children(node))
-        # for p in os.listdir(abspath):
-        #     self.insert_node(node, p, os.path.join(abspath, p))
-        # else:
-        #     print('bad!')
+                self.hint_content.set('文件必须是图片！')
 
     '''ui_tree END'''
 
@@ -241,10 +197,25 @@ class WinGUI(Tk):
         canvas.place(x=280, y=80, width=720, height=400)
         return canvas
 
-    # def __tk_label_img(self, parent):
-    #     label = Label(parent)
-    #     label.place(x=280, y=80, width=720, height=400)
-    #     return label
+    def __tk_label_addition(self, parent):
+        label = Label(parent, text="额外配置", anchor="center", font=self.myFont)
+        label.place(x=1020, y=420, width=240, height=40)
+        return label
+
+    def __tk_check_button_compare(self, parent):
+        label = Checkbutton(parent, text='暗光模型比较', variable=parent.has_compare, style='my.TCheckbutton')
+        label.place(x=1020, y=480, width=180, height=30)
+        return label
+
+    def __tk_check_button_com_object(self, parent):
+        label = Checkbutton(parent, text='对结果进行目标检测', variable=parent.has_com_obj, style='my.TCheckbutton')
+        label.place(x=1040, y=520, width=240, height=30)
+        return label
+
+    def __tk_check_button_com_origin(self, parent):
+        label = Checkbutton(parent, text='目标检测包含原图', variable=parent.has_com_ori, style='my.TCheckbutton')
+        label.place(x=1040, y=560, width=240, height=30)
+        return label
 
     def __tk_label_canvas(self, parent):
         label = Label(parent, text="图片展示", anchor="center", font=self.myFont)
@@ -269,13 +240,6 @@ class WinGUI(Tk):
         cb = Checkbutton(parent, text="强光分离", variable=parent.is_light_check, style='my.TCheckbutton')
         cb.place(x=1020, y=80, width=120, height=30)
         return cb
-
-    def __tk_list_box_box_listdir(self, parent):
-        lb = Listbox(parent, selectmode="extended", font=tkFont.Font(family='微软雅黑', size=10))
-
-        lb.place(x=20, y=80, width=240, height=400)
-        self.create_bar(parent, lb, True, False, 20, 80, 240, 400, 1280, 720)
-        return lb
 
     def __tk_label_lb_listdir(self, parent):
         label = Label(parent, text="文件列表", anchor="center", font=self.myFont)
@@ -309,7 +273,6 @@ class WinGUI(Tk):
         return label
 
     def __tk_check_button_select_object(self, parent):
-        # is_object_check = self.is_object_check
         cb = Checkbutton(parent, text="目标检测", variable=parent.is_object_check, style='my.TCheckbutton')
         cb.place(x=1020, y=240, width=120, height=30)
         return cb
@@ -356,6 +319,11 @@ class WinGUI(Tk):
         btn.place(x=1020, y=620, width=240, height=80)
         return btn
 
+    # @staticmethod
+    # def tmp_start():
+    #     if tkinter.messagebox.askokcancel('提示', '确认？'):
+    #         ctl.start_test()
+
     def __tk_button_switch_dir(self, parent):
         btn = Button(parent, text="切换输入/输出文件夹", takefocus=False, style='small.TButton')
         btn.place(x=20, y=600, width=240, height=40)
@@ -386,7 +354,6 @@ class WinGUI(Tk):
         btn.place(x=770, y=500, width=230, height=40)
         return btn
 
-
     def __tk_label_text_hint(self, parent):
         label = Label(parent, text="标签", anchor="center", textvariable=self.hint_content, font=self.labelFont)
         label.place(x=280, y=550, width=720, height=150)
@@ -407,39 +374,12 @@ class WinGUI(Tk):
         ipt.place(x=1120, y=320, width=120, height=30)
         return ipt
 
-    def tk_listdir_update(self):
-        self.tk_list_box_box_listdir.delete(0, END)
-        input_path = './input/'
-        files = os.listdir(input_path)
-        for file in files:
-            self.tk_list_box_box_listdir.insert(END, file)
-
-    # def open_or_show(self, evt):
-    #     global img_png  # 函数运行结束就被回收了，会显示的是空白
-    #     # filename = self.tree.selection_get()
-    #     filename = self.tree.item(self.tree.focus())['text']
-    #     # filename = self.tk_list_box_box_listdir.selection_get()
-    #     # filename = self.tk_list_box_box_listdir.get(index)
-    #     filepath = os.path.join('./input/' + filename)
-    #     abs_path = os.path.abspath(filepath)
-    #     img_open = Image.open(abs_path)
-    #     img_open = img_open.resize((720, 400))  # 规定图片大小
-    #     img_png = ImageTk.PhotoImage(img_open)
-    #     # self.label_img = Label(self.tk_label_canvas, image=img_png)
-    #     # self.label_img.pack()
-    #     self.label_img = Label(self, image=img_png)
-    #     self.label_img.place(x=280, y=80, width=720, height=400)
-    #     # self.label_img.configure(width=400, height=400)
-    #     # self.label_img.config(width=400, height=400)
-
-
 class Win(WinGUI):
     def __init__(self, controller):
         self.ctl = controller
         super().__init__()
         self.__event_bind()
         self.ctl.init(self)
-        # self.tk_listdir_update()
 
     def __event_bind(self):
         self.tk_button_start_test.bind('<Button-1>', self.ctl.start_test)
@@ -454,9 +394,6 @@ class Win(WinGUI):
         self.tk_button_check.bind('<Button-1>', self.ctl.check_selected_files)
         self.tk_button_delete.bind('<Button-1>', self.ctl.delete_selected_files)
         self.tk_button_refresh.bind('<Button-1>', self.ctl.refresh_files)
-        # self.tree.bind('<Double-Button-1>', self.open_or_show)
-        # self.tk_list_box_box_listdir.bind('<Double-Button-1>', self.ctl.open_or_show)
-        # self.tk_list_box_box_listdir.bind('<Double-Button-1>', self.open_or_show)
 
 
 def dragged_files(files):
@@ -464,19 +401,10 @@ def dragged_files(files):
     showinfo('您拖入的文件', msg)
     for file in files:
         main_logic.mycopyfile(file.decode('gbk'), main_logic.input_path)
-    # tk_listdir_update()
 
 
 if __name__ == "__main__":
-    # win = WinGUI()
     ctl = Controller()
     win = Win(ctl)
-    # # 告诉操作系统使用程序自身的dpi适配
-    # ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    # # 获取屏幕的缩放因子
-    # ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
-    # # 设置程序缩放
-    # win.tk.call('tk', 'scaling', ScaleFactor / 75)
-    # windnd.hook_dropfiles(win.tk_list_box_box_listdir, func=dragged_files)
     windnd.hook_dropfiles(win.tree, func=dragged_files)
     win.mainloop()
