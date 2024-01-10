@@ -8,19 +8,14 @@ from pylab import mpl
 mpl.rcParams["font.sans-serif"] = ["SimHei"]
 mpl.rcParams["figure.autolayout"] = True
 
-# import gc
-
 import light_effects_clear
 import night_enhancement
 import object_detection
-# import image_gather
 
 '''settings'''
 
 has_night_enhancement_compare = False
 has_object_detection_compare = False
-# has_object_detection_imgszs = False
-# has_object_detection_confs = False
 has_detect_origin_img = False
 
 is_light_effects_clear_chosen = True
@@ -55,11 +50,11 @@ def is_input_dir_empty() -> bool:
     return len(in_files) == 0
 
 
-def mycopyfile(srcfile, dstpath):                       # 复制函数
+def mycopyfile(srcfile, dstpath):                      # 复制函数
     if not os.path.isfile(srcfile):
         print("%s not exist!" % srcfile)
     else:
-        fpath, fname = os.path.split(srcfile)             # 分离文件名和路径
+        fpath, fname = os.path.split(srcfile)          # 分离文件名和路径
         if not os.path.exists(dstpath):
             os.makedirs(dstpath)                       # 创建路径
         shutil.copy(srcfile, dstpath + fname)          # 复制文件
@@ -76,8 +71,6 @@ def clear(clear_input=False, clear_detect=False):
     os.mkdir(light_effect_result_path)
     shutil.rmtree(night_enhancement_path)
     os.mkdir(night_enhancement_path)
-    # shutil.rmtree(night_enhancement_result_path)
-    # os.mkdir(night_enhancement_result_path)
     shutil.rmtree(night_enhancement_result_root)
     os.mkdir(night_enhancement_result_root)
     shutil.rmtree(object_detection_path)
@@ -85,7 +78,6 @@ def clear(clear_input=False, clear_detect=False):
     if clear_detect:
         if os.path.exists(object_detection_result_path):
             shutil.rmtree(object_detection_result_path)
-        # os.mkdir(object_detection_result_path)
 
 
 def start(input_included=True, ui=None):
@@ -93,13 +85,6 @@ def start(input_included=True, ui=None):
     if not is_night_enhancement_chosen and not is_object_detection_chosen and not is_light_effects_clear_chosen:
         print("At least choose one!")
         return
-
-    # if has_object_detection_compare:
-    #     has_night_enhancement_compare = True
-
-    # if not has_night_enhancement_compare:
-    #     has_object_detection_compare = False
-    #     has_detect_origin_img = False
 
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     output_time = output_path + nowTime + '/'
@@ -136,7 +121,6 @@ def start(input_included=True, ui=None):
     if is_night_enhancement_chosen:
         for file in light_effects_result_files:
             mycopyfile(os.path.join(light_effect_result_path, file), os.path.join(night_enhancement_path))
-            # move_file(light_effect_result_path, night_enhancement_path, file)
         if has_night_enhancement_compare:
             for model_name in ["LOL_v1", "LOL_v2_real", "LOL_v2_synthetic", "SDSD_indoor", "SDSD_outdoor", "SID", "SMID",
                         "FiveK"]:
@@ -287,7 +271,6 @@ def start(input_included=True, ui=None):
             plt.figure(figsize=(12.8, 9.6))
         else:
             plt.figure(figsize=(12.8, 4.8))
-        # plt.tight_layout(pad=0.4)
         plt.subplot(sub_rows,2,1)
         plt.imshow(mpimg.imread(os.path.join(input_path, input_files[i])))
         plt.title('原图像')
@@ -307,22 +290,15 @@ def start(input_included=True, ui=None):
         if is_object_detection_chosen:
             pos += 1
             plt.subplot(sub_rows,2,pos)
-            # plt.imshow(mpimg.imread(os.path.join(object_detection_result_path, object_detection_result_files[i])))
             target_dir = output_time + 'object_detected/'
             plt.imshow(mpimg.imread(os.path.join(target_dir, object_detection_result_files[i])))
             plt.title('目标检测结果')
             plt.xticks([]), plt.yticks([])
-        # plt.title(titles)
-        # plt.imsave(os.path.join(output_time, file))
         plt.savefig(os.path.join(output_time, input_files[i]))
         plt.close()
 
-        # del plt
-        # gc.collect()
-
     with open(os.path.join(output_time, nowTime + '.log.txt'), 'w', encoding='utf-8') as f:
         f.write('[images]\n')
-        # f.writelines(input_files)
         for file in input_files:
             f.write(f'{file}\n')
         f.write('\n[settings]\n')

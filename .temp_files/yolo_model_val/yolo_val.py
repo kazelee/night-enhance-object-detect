@@ -3,7 +3,7 @@ from ultralytics import YOLO
 # Load a model
 # model = YOLO('yolov8m.pt')  # load an official model
 # model = YOLO('runs/detect/yolov8_640_ep200/weights/best.pt')  # load a custom model
-model = YOLO('object_weights/bdd_day40k20c.pt')
+model = YOLO('../../object_weights/bdd_day40k20c.pt')
 
 '''change dataset_dir in "C:\\Users\\LENOVO\\AppData\\Roaming\\Ultralytics\\settings.yaml"'''
 

@@ -164,7 +164,6 @@ class WinGUI(Tk):
         if abspath and os.path.isfile(abspath):
             return
         abspath = self.nodes.pop(node, None)
-        # abspath = self.nodes.get(node)
         if abspath:
             if os.path.isdir(abspath):
                 self.tree.delete(self.tree.get_children(node))
@@ -294,8 +293,6 @@ class WinGUI(Tk):
 
     '''list dir buttons BEG'''
     def __tk_button_check(self, parent):
-        # s = Style()
-        # s.configure('small.TButton', font=('SimHei', 12))
         btn = Button(parent, text="使用默认应用打开", takefocus=False, style='small.TButton')
         btn.place(x=20, y=550, width=155, height=40)
         return btn
@@ -318,11 +315,6 @@ class WinGUI(Tk):
         btn = Button(parent, takefocus=False, textvariable=self.start_state, style='my.TButton')
         btn.place(x=1020, y=620, width=240, height=80)
         return btn
-
-    # @staticmethod
-    # def tmp_start():
-    #     if tkinter.messagebox.askokcancel('提示', '确认？'):
-    #         ctl.start_test()
 
     def __tk_button_switch_dir(self, parent):
         btn = Button(parent, text="切换输入/输出文件夹", takefocus=False, style='small.TButton')
@@ -382,17 +374,17 @@ class Win(WinGUI):
         self.ctl.init(self)
 
     def __event_bind(self):
-        self.tk_button_start_test.bind('<Button-1>', self.ctl.start_test)
+        self.tk_button_start_test.bind('<ButtonRelease-1>', self.ctl.start_test)
         self.tk_button_switch_dir.bind('<Button-1>', self.ctl.switch_dir)
-        self.tk_button_add_file.bind('<Button-1>', self.ctl.add_files)
-        self.tk_button_clear_file.bind('<Button-1>', self.ctl.clear_files)
+        self.tk_button_add_file.bind('<ButtonRelease-1>', self.ctl.add_files)
+        self.tk_button_clear_file.bind('<ButtonRelease-1>', self.ctl.clear_files)
         self.tk_button_open_last_test.bind('<Button-1>', self.ctl.check_last_test)
         self.tk_button_open_cur_dir.bind('<Button-1>', self.ctl.open_cur_dir)
         self.tk_button_open_last_argu.bind('<Button-1>', self.ctl.check_last_argu)
         self.tk_button_open_cur_img.bind('<Button-1>', self.ctl.open_cur_img)
 
         self.tk_button_check.bind('<Button-1>', self.ctl.check_selected_files)
-        self.tk_button_delete.bind('<Button-1>', self.ctl.delete_selected_files)
+        self.tk_button_delete.bind('<ButtonRelease-1>', self.ctl.delete_selected_files)
         self.tk_button_refresh.bind('<Button-1>', self.ctl.refresh_files)
 
 

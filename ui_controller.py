@@ -31,27 +31,16 @@ class Controller:
         self.ui = ui
         # TODO 组件初始化 赋值操作
 
-    # def tmp_start_test(self, evt):
-    #     flag = messagebox.askokcancel('提示', '确定测试运行吗？')
-    #     if flag:
-    #         self.start_test(evt)
-
     def start_test(self, evt):
-        # flag = messagebox.askokcancel('提示', '确定测试运行吗？')
-        # if not flag:
-        #     return
         if not messagebox.askokcancel('提示', '要执行此操作吗？'):
-        #     self.ui.tk_button_start_test.config(state=NORMAL)
             return
 
         if not self.ui.is_light_check.get() and not self.ui.is_night_check.get() and not self.ui.is_object_check.get():
             self.ui.hint_content.set("请至少选择参数设置中的一项！")
-            # self.ui.tk_button_start_test.config(state=NORMAL)
             return
 
         if main_logic.is_input_dir_empty():
             self.ui.hint_content.set("input 文件夹中没有文件！")
-            # self.ui.tk_button_start_test.config(state=NORMAL)
             return
 
         self.ui.hint_content.set("正在测试中……")
@@ -68,7 +57,6 @@ class Controller:
             main_logic.has_detect_origin_img = self.ui.has_com_ori.get()
 
         main_logic.light_imgsz = int(self.ui.light_imgsz.get())
-        # main_logic.detect_imgsz = int(self.ui.object_imgsz.get())
         new_light_imgsz = int(self.ui.object_imgsz.get()) // 32 * 32 + 32 if int(self.ui.object_imgsz.get()) % 32 != 0 \
             else int(self.ui.object_imgsz.get())
         main_logic.detect_imgsz = new_light_imgsz
@@ -83,7 +71,6 @@ class Controller:
         start()
 
         self.ui.hint_content.set("测试完成！")
-        # self.ui.start_state.set("开始测试")
 
     def check_selected_files(self, evt):
         for node in self.ui.tree.selection():
@@ -95,7 +82,6 @@ class Controller:
 
     def delete_selected_files(self, evt):
         if not messagebox.askokcancel('提示', '确定要删除选择的文件吗？'):
-        #     self.ui.tk_button_delete.config(state=NORMAL)
             return
 
         for node in self.ui.tree.selection():
@@ -129,18 +115,8 @@ class Controller:
             main_logic.mycopyfile(file_path, './input/')
 
     def clear_files(self, evt):
-        # tmp_flag = False
         if not messagebox.askokcancel('提示', f'确定清空{self.ui.base_dir}文件夹下的所有文件吗？'):
-            # self.ui.tk_button_clear_file.configure(takefocus=False)
-            # self.ui.tk_button_clear_file.state(['!selected'])
-            # self.ui.tk_button_clear_file.configure(relief=RAISED)
-            # self.ui.tk_button_clear_file.setvar('state', '!selected')
-            # self.ui.tk_button_clear_file.update()
-            # self.ui.tk_button_clear_file.configure(state='disabled')
-            # self.ui.tk_button_clear_file.configure(state='normal')
-            # tmp_flag = True
             return
-        # if tmp_flag:
         base = './' + self.ui.base_dir + '/'
         shutil.rmtree(base)
         os.mkdir(base)
