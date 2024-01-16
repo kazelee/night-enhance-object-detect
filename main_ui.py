@@ -87,7 +87,7 @@ class WinGUI(Tk):
         self.tk_check_button_com_origin = self.__tk_check_button_com_origin(self)
 
     def __win(self):
-        self.title("暗光增强车辆检测")
+        self.title("光效分离暗光增强系统")
         # 设置窗口大小、居中
         width = 1280
         height = 720
@@ -187,7 +187,10 @@ class WinGUI(Tk):
                 self.label_img.place(x=280, y=80, width=720, height=400)
             except PIL.UnidentifiedImageError:
                 print('文件必须是图片')
-                self.hint_content.set('文件必须是图片！')
+                # self.hint_content.set('文件必须是图片！')
+                print(f'try to open {abspath}')
+                os.system(f'start explorer {abspath}')
+
 
     '''ui_tree END'''
 
@@ -396,6 +399,12 @@ def dragged_files(files):
 
 
 if __name__ == "__main__":
+    # 确保开始运行时有input和output文件夹
+    if not os.path.exists('./input/'):
+        os.mkdir('./input/')
+    if not os.path.exists('./output/'):
+        os.mkdir('./output')
+
     ctl = Controller()
     win = Win(ctl)
     windnd.hook_dropfiles(win.tree, func=dragged_files)

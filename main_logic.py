@@ -7,6 +7,7 @@ from pylab import mpl
 # 设置显示中文字体
 mpl.rcParams["font.sans-serif"] = ["SimHei"]
 mpl.rcParams["figure.autolayout"] = True
+mpl.rcParams["font.size"] = 20
 
 import light_effects_clear
 import night_enhancement
@@ -80,8 +81,42 @@ def clear(clear_input=False, clear_detect=False):
             shutil.rmtree(object_detection_result_path)
 
 
+def create_dir(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def remove_dir(path: str):
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
+
+def create_temp_dirs():
+    create_dir(light_effect_path)
+    create_dir(light_effect_result_path)
+    create_dir(night_enhancement_path)
+    create_dir(night_enhancement_result_path)
+    create_dir(night_enhancement_result_root)
+    create_dir(object_detection_path)
+    # create_dir(object_detection_result_path)
+
+
+def clear_without_rebuild():
+    remove_dir(light_effect_path)
+    remove_dir(light_effect_result_path)
+    # remove_dir(night_enhancement_path)
+    # remove_dir(night_enhancement_result_path)
+    # remove_dir(night_enhancement_result_root)
+    remove_dir('./data/')
+    remove_dir('./results/')
+    remove_dir(object_detection_path)
+    # remove_dir(object_detection_result_path)
+    remove_dir('./runs/')
+
+
 def start(input_included=True, ui=None):
-    clear(clear_detect=True)
+    # clear(clear_detect=True)
+    create_temp_dirs()
     if not is_night_enhancement_chosen and not is_object_detection_chosen and not is_light_effects_clear_chosen:
         print("At least choose one!")
         return
@@ -320,7 +355,8 @@ def start(input_included=True, ui=None):
             if has_object_detection_compare:
                 f.write(f'\torigin detected: {has_detect_origin_img}\n')
 
-    clear(clear_detect=True)
+    # clear(clear_detect=True)
+    clear_without_rebuild()
 
 
 if __name__ == '__main__':
