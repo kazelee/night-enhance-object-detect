@@ -82,8 +82,9 @@ def clear(clear_input=False, clear_detect=False):
 
 
 def create_dir(path: str):
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
 
 
 def remove_dir(path: str):
@@ -153,7 +154,8 @@ def start(input_included=True, ui=None):
     light_effects_result_files = os.listdir(light_effect_result_path)
 
     '''【暗光增强】'''
-    if is_night_enhancement_chosen:
+    if is_night_enhancement_chosen or has_night_enhancement_compare:
+        # 相当于，只要选了compare，默认is_night_enhancement为真
         for file in light_effects_result_files:
             mycopyfile(os.path.join(light_effect_result_path, file), os.path.join(night_enhancement_path))
         if has_night_enhancement_compare:
@@ -208,7 +210,8 @@ def start(input_included=True, ui=None):
     night_enhancement_result_files = os.listdir(night_enhancement_result_path)
 
     '''【目标检测】'''
-    if is_object_detection_chosen:
+    if is_object_detection_chosen or has_object_detection_compare:
+        # 相当于，只要选了compare，默认is_object_detection_chosen为真
         if has_object_detection_compare:
             for m in ["LOL_v1", "LOL_v2_real", "LOL_v2_synthetic", "SDSD_indoor", "SDSD_outdoor", "SID", "SMID",
                         "FiveK"]:
@@ -340,14 +343,16 @@ def start(input_included=True, ui=None):
         f.write(f'light effects clear: {is_light_effects_clear_chosen}\n')
         if is_light_effects_clear_chosen:
             f.write(f'\timgsz: {light_imgsz}\n')
-        f.write(f'night enhancement: {is_night_enhancement_chosen}\n')
-        if is_night_enhancement_chosen:
+        f.write(f'night enhancement: {is_night_enhancement_chosen or has_night_enhancement_compare}\n')
+        if is_night_enhancement_chosen or has_night_enhancement_compare:
             f.write(f'\tmodel: {enhance_model}\n')
-        f.write(f'object detection: {is_object_detection_chosen}\n')
-        if is_object_detection_chosen:
+        f.write(f'object detection: {is_object_detection_chosen or has_object_detection_compare}\n')
+        if is_object_detection_chosen or has_object_detection_compare:
             f.write(f'\tmodel: {detect_model_name}\n')
             f.write(f'\timgsz: {detect_imgsz}\n')
             f.write(f'\tconf: {detect_conf}\n')
+        # state_1: bool = not is_night_enhancement_chosen and has_night_enhancement_compare
+        # state_2: bool = not is_object_detection_chosen and has_object_detection_compare
         f.write('\n[addition]\n')
         f.write(f'night enhancement model comparison: {has_night_enhancement_compare}\n')
         if has_night_enhancement_compare:

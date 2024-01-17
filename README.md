@@ -30,11 +30,31 @@ HFUT 领域方向设计 & 毕设选题：
 
 ## 初始化操作
 
-通过 `requirements.txt` 文件安装必要包（没有测试效果，可能会有遗漏）
+- `git clone` 本仓库或下载压缩包到本地
+- 为项目创建 conda 虚拟环境，建议使用 Python 3.7 版本，参考命令：
 
-从 `ClearLightEffect/results/delighteffects/model/` 下的文件 `delighteffects_params_0600000.pt.txt` 中的链接，下载模型并移动到同路径，参考下面的文件结构。
+```commandline
+conda create -n Retinexformer python=3.7
+conda activate Retinexformer
+```
 
-确保文件结构如下（必要文件已列出）：
+（该步骤亦可通过 Anaconda 直接创建）
+
+- 运行下列命令安装依赖项
+
+```commandline
+conda install pytorch=1.11 torchvision cudatoolkit=11.3 -c pytorch
+pip install -r .\requirements.txt
+// 如有需要可根据实际网络情况选择下载镜像，如：
+pip install -r .\requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r .\requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+```
+
+（部署完成的环境包含依赖项参考 `env_ref.txt`，由命令 `pip freeze > xxx.txt` 生成）
+
+- 从 `ClearLightEffect/results/delighteffects/model/` 下的文件 `delighteffects_params_0600000.pt.txt` 中的链接，下载模型并移动到同路径，参考下面的文件结构：
+
+（注：如果忽略此文件，运行时请不要勾选“强光分离”选项）
 
 ```
 ├─basicsr
@@ -46,7 +66,7 @@ HFUT 领域方向设计 & 毕设选题：
 │  │  networks.py
 │  │  utils.py
 │  ├─light-effects // 1.1 强光分离数据集的临时位置
-│  ├─output // 1.2 强光分离结果的临时位置
+│  ├─output        // 1.2 强光分离结果的临时位置
 │  └─results
 │     └─delighteffects
 │         └─model
@@ -54,19 +74,19 @@ HFUT 领域方向设计 & 毕设选题：
 │                 delighteffects_params_0600000.pt.txt
 ├─data
 │  └─Test
-│      └─input // 2.1 暗光增强数据的临时位置
+│      └─input     // 2.1 暗光增强数据的临时位置
 ├─Enhancement
 │     test_from_dataset.py
 │     test_my_dataset.py
 │     utils.py   
-├─input // 0 输入的测试集
-├─object_test // 3.1 目标检测数据的临时位置
+├─input            // 0 输入的测试集
+├─object_test      // 3.1 目标检测数据的临时位置
 ├─object_weights
 │      car_day_40k.pt
 │      yolov8n.pt     
 ├─Options
 │      RetinexFormer_Test.yml
-├─output // 4 最终结果存储的位置，文件夹名称为测试的时间戳
+├─output           // 4 最终结果存储的位置，文件夹名称为测试的时间戳
 ├─pretrained_weights
 │      FiveK.pth
 │      LOL_v1.pth
@@ -80,8 +100,10 @@ HFUT 领域方向设计 & 毕设选题：
 │  └─Test
 │      └─RetinexFormer_Test // 2.2 暗光增强的结果临时位置
 └─runs
-   └─detect // 3.2 目标检测的结果临时位置：runs/detect/predict
+   └─detect                 // 3.2 目标检测的结果临时位置：runs/detect/predict
 ```
+
+注：其中注释标注的文件夹会在运行时自动生成
 
 ## 测试运行
 
