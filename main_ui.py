@@ -28,7 +28,7 @@ class WinGUI(Tk):
         self.has_compare = BooleanVar(value=False)
         self.has_com_obj = BooleanVar(value=False)
         self.has_com_ori = BooleanVar(value=False)
-
+ 
         self.base_dir = 'input'
         self.cur_img_path = ''
 

@@ -9,6 +9,8 @@ mpl.rcParams["font.sans-serif"] = ["SimHei"]
 mpl.rcParams["figure.autolayout"] = True
 mpl.rcParams["font.size"] = 20
 
+plt.switch_backend('agg')
+
 import light_effects_clear
 import night_enhancement
 import object_detection
@@ -116,6 +118,12 @@ def clear_without_rebuild():
 
 
 def start(input_included=True, ui=None):
+    remove_dir('./input/')
+    create_dir('./input/')
+    test_files = os.listdir('./static/img')
+    for file in test_files:
+        mycopyfile(os.path.join('./static/img', file), os.path.join('./input/'))
+
     # clear(clear_detect=True)
     create_temp_dirs()
     if not is_night_enhancement_chosen and not is_object_detection_chosen and not is_light_effects_clear_chosen:
@@ -283,7 +291,7 @@ def start(input_included=True, ui=None):
             for file in result_files:
                 mycopyfile(os.path.join(object_detection_result_path, file), os.path.join(new_dir))
 
-    if is_object_detection_chosen:
+    if is_object_detection_chosen or has_object_detection_compare:
         if not os.path.exists(object_detection_result_path):
             os.mkdir(object_detection_result_path)
         if has_object_detection_compare:
@@ -295,9 +303,9 @@ def start(input_included=True, ui=None):
     rows = 0
     if is_light_effects_clear_chosen:
         rows += 1
-    if is_night_enhancement_chosen:
+    if is_night_enhancement_chosen or has_night_enhancement_compare:
         rows += 1
-    if is_object_detection_chosen:
+    if is_object_detection_chosen or has_object_detection_compare:
         rows += 1
 
     for i in range(len(input_files)):
@@ -319,13 +327,13 @@ def start(input_included=True, ui=None):
             plt.imshow(mpimg.imread(os.path.join(light_effect_result_path, light_effects_result_files[i])))
             plt.title('强光分离后')
             plt.xticks([]), plt.yticks([])
-        if is_night_enhancement_chosen:
+        if is_night_enhancement_chosen or has_night_enhancement_compare:
             pos += 1
             plt.subplot(sub_rows,2,pos)
             plt.imshow(mpimg.imread(os.path.join(night_enhancement_result_path, night_enhancement_result_files[i])))
             plt.title('暗光增强后')
             plt.xticks([]), plt.yticks([])
-        if is_object_detection_chosen:
+        if is_object_detection_chosen or has_object_detection_compare:
             pos += 1
             plt.subplot(sub_rows,2,pos)
             target_dir = output_time + 'object_detected/'
