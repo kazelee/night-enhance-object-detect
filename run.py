@@ -80,6 +80,11 @@ def do_something():
 
 @app.route('/get-picture/', methods=['GET'])
 def get_picture():
+    # global last_running_state
+    # global is_running
+    # last_running_state = False
+    # is_running = False
+
     picture_data_list = []
     img_path = './static/img'
 
@@ -159,8 +164,33 @@ def get_signal():
     return jsonify(signals)
 
 
+# @app.route('/get-signal2/', methods=['GET'])
+# def get_signal():
+#     global last_running_state
+#     global is_running
+#     signals = []
+#     if not last_running_state and not is_running:
+#         signals.append('none')
+#     elif not last_running_state and is_running:
+#         signals.append('start')
+#         last_running_state = True
+#     elif last_running_state and is_running:
+#         signals.append('running')
+#     else:
+#         # last = True and is_running = false
+#         signals.append('end')
+#         last_running_state = False
+#
+#     return jsonify(signals)
+
+
 @app.route('/set-args/', methods=['POST'])
 def set_args():
+    # global last_running_state
+    # global is_running
+    # last_running_state = False
+    # is_running = False
+
     tmp_args = request.get_json()
     main_logic.is_light_effects_clear_chosen = tmp_args["delivery"]
     main_logic.is_night_enhancement_chosen = tmp_args["delivery2"]
@@ -190,6 +220,7 @@ def set_args():
 
     is_running = False
 
+    # 运行完删除原图，表示已经完成
     return jsonify({"message": "图像处理已完成"})
 
 

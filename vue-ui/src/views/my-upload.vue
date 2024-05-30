@@ -203,7 +203,21 @@ export default {
     },
     mounted() {
         // 运行时再启用
-        setInterval(this.getSignal, 3000)
+        // setInterval(this.getSignal, 3000)
+
+        // vue项目使用定时器每隔几秒请求一次接口
+        // https://blog.csdn.net/qq_39840470/article/details/104635153
+        // window.setInterval(()=> {
+        //     setTimeout(this.getSignal, 0)
+        // }, 3000);
+        // this._intervalGetSignal = new WeakMap();
+        // this._intervalGetSignal.set(this, this.getSignal)
+    },
+    // vue中 解决setInterval越来越快的bug
+    // https://blog.csdn.net/weixin_35750483/article/details/129074853
+    beforeDestroy() {
+        // clearInterval(this.getSignal)
+        // clearInterval(this._intervalGetSignal.get(this))
     },
     computed: {
         currentImage() {
@@ -239,6 +253,34 @@ export default {
                 console.log(error)
             })
         },
+        // getSignal2(timer) {
+        //     axios
+        //     .get("http://127.0.0.1:5000/get-signal2/")
+        //     .then((response) => {
+        //         response.data.forEach(element => {
+        //             // console.log(element)
+        //             switch (element) {
+        //                 case 'none':
+        //                     break;
+        //                 case 'start':
+        //                     this.loading = true;
+        //                     ElMessage.success('正在处理……');
+        //                     break;
+        //                 case 'end':
+        //                     this.loading = false;
+        //                     ElMessage.success('处理完成！');
+        //                     this.refreshImage();
+        //                     // url = this.srcList[0];
+        //                     break;
+        //                 case 'running':
+        //                     break;
+        //             }
+        //         })
+        //     })
+        //     .catch((error) => {
+        //         console.log(error)
+        //     })
+        // },
         openExplorer() {
             var tmp_data = {
                 todo: 'open-last'
